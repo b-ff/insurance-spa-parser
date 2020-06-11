@@ -138,4 +138,6 @@ class Parser {
   }
 }
 
-(window as any).parser = new Parser()
+setTimeout((): void => {
+  (window as any).parser = new Parser()
+}, 2000)
