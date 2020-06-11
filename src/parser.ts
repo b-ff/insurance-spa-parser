@@ -105,7 +105,7 @@ class Parser {
 
     setTimeout((): void => {
       this.downloadFile(this.getFilesList().pop())
-    }, 2000)
+    }, 5000)
 
   }
 
