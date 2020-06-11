@@ -1,6 +1,13 @@
+const REPORT_IN_MGFOMS = 'Отчёт МО в МГФОМС'
+const REPORT_IN_SMO = 'Отчёт МО в СМО'
+
+
 const DATE_FORMAT = 'dd.mm.yyyy hh:ii'
 
 const START_BUTTON_CONTAINER_ID_PATTERN = /^filter-panel-\d{4,}_header-title-textEl$/
+const MESSAGE_TYPE_FIELD_ID_PATTERN = /^messageTypeCombo-\d{4,}-inputEl$/
+const INSURER_FIELD_ID_PATTERN = /^commonInsurersCombo-{4,}-inputEl$/
+const INSURERS_LIST_ID_PATTERN = /^commonInsurersCombo-{4,}-picker-listEl$/
 const PARCELS_LIST_SELECTOR = '#parcelsList-1980'
 const URL_COLUMN_SELECTOR = '.x-grid-cell-gridcolumn-1988'
 const SEND_DATE_COLUMN_SELECTOR = '.x-grid-cell-datecolumn-1992'
@@ -74,13 +81,20 @@ class Parser {
   }
 
   public getMessageTypes(): string[] {
-    return []
+    return [
+      REPORT_IN_MGFOMS,
+      REPORT_IN_SMO
+    ]
   }
 
-  public setMessageType(): void {}
+  public setMessageType(messageType: string): void {
+    const input = getElementByIdPattern(document, MESSAGE_TYPE_FIELD_ID_PATTERN, 'input') as HTMLInputElement
+    input.value = messageType
+  }
 
   public getInsurers(): string[] {
-    return []
+    return Array.from(getElementByIdPattern(document, INSURERS_LIST_ID_PATTERN, 'ul').childNodes)
+      .map((element: Element): string => element.textContent.trim())
   }
 
   public setInsurer(): void {}
