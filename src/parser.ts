@@ -10,6 +10,7 @@ const MESSAGE_TYPE_FIELD_ID_PATTERN = /^messageTypeCombo-\d{4,}-inputEl$/
 const INSURER_FIELD_ID_PATTERN = /^commonInsurersCombo-\d{4,}-inputEl$/
 const INSURERS_LIST_ID_PATTERN = /^commonInsurersCombo-\d{4,}-picker-listEl$/
 const INSURERS_LIST_TOGGLE_ID_PATTERN = /^commonInsurersCombo-\d{4,}-trigger-picker$/
+const FILTERS_PANEL_ID_PATTERN = /^filter-panel-\d{4,}$/
 const PARCELS_LIST_SELECTOR = '#parcelsList-1980'
 const URL_COLUMN_SELECTOR = '.x-grid-cell-gridcolumn-1988'
 const SEND_DATE_COLUMN_SELECTOR = '.x-grid-cell-datecolumn-1992'
@@ -95,7 +96,11 @@ class Parser {
   public startParser(): void {
     this.log('Parser started!')
 
-    this.downloadFile(this.getFilesList().pop())
+    this.setMessageType(this.getMessageTypes()[0])
+    this.setInsurer(this.getInsurers()[0])
+    this.getFilterSubmitButton().click()
+
+    // this.downloadFile(this.getFilesList().pop())
   }
 
   public getMessageTypes(): string[] {
@@ -115,7 +120,21 @@ class Parser {
       .map((element: Element): string => element.textContent.trim())
   }
 
-  public setInsurer(): void {}
+  public setInsurer(insurer: string): void {
+    const input = getElementByIdPattern(document, INSURER_FIELD_ID_PATTERN, 'input') as HTMLInputElement
+    input.value = insurer
+  }
+
+  public getFilterSubmitButton(): HTMLElement | null {
+    const filtersPanel = getElementByIdPattern(document, FILTERS_PANEL_ID_PATTERN) as HTMLElement
+    const buttons = filtersPanel.querySelectorAll('a.x-btn')
+
+    if (buttons.length) {
+      return buttons[0] as HTMLElement
+    } else {
+      return null
+    }
+  }
 
   private getDateFromElement(node: Node): Date {
     if (node) {
