@@ -17,6 +17,7 @@ const FILE_LINK_CELL_INDEX = 5
 const FILE_SEND_DATE_CELL_INDEX = 9
 
 const FILTERS_CHANGE_INTERVAL = 2000
+const PARCELS_LOAD_TIME = 5000
 
 interface IFileData {
   sendDate: Date,
@@ -27,8 +28,6 @@ const getElementByIdPattern = (parent: HTMLElement | Document, idPattern: RegExp
   const elements = parent.querySelectorAll(tagName)
   return Array.from(elements).find((element: Element): boolean => idPattern.test(element.id))
 }
-
-(window as any).getElementByIdPattern = getElementByIdPattern
 
 const stringToDateByFormat = (text: string, format: string): Date => {
   const normalized      = text.replace(/[^a-zA-Z0-9]/g, '-')
@@ -99,13 +98,38 @@ class Parser {
   public startParser(): void {
     this.log('Parser started!')
 
-    this.setMessageType(this.getMessageTypes()[0])
-    this.setInsurer(this.getInsurers()[0])
-    this.getFilterSubmitButton().click()
+    const messageTypes = this.getMessageTypes()
+    const insurers = this.getInsurers()
 
-    setTimeout((): void => {
-      this.downloadFile(this.getFilesList().pop())
-    }, 5000)
+    this.log('Loaded filter values:', { messageTypes, insurers })
+    this.log('Running a queue')
+
+    let increment = 0
+
+    messageTypes.forEach((messageType: string, messageTypeIndex: number): void => {
+      insurers.forEach((insurer: string, insurerIndex: number): void => {
+        setTimeout((): void => {
+          this.log('Applying filter values:', {messageType, insurer})
+          this.setMessageType(messageType)
+          this.setInsurer(insurer)
+          this.getFilterSubmitButton().click()
+
+          setTimeout((): void => {
+            this.log('Getting files list')
+            this.downloadFile(this.getFilesList().pop())
+
+            const isLastMessageType = messageTypeIndex === messageTypes.length - 1
+            const isLastInsurer = insurerIndex === insurers.length - 1
+
+            if (isLastMessageType && isLastInsurer) {
+              alert('Загрузка файлов завершена!')
+            }
+          }, PARCELS_LOAD_TIME)
+        }, increment * (PARCELS_LOAD_TIME + FILTERS_CHANGE_INTERVAL))
+
+        increment++
+      })
+    })
 
   }
 
@@ -191,4 +215,7 @@ class Parser {
   }
 }
 
-(window as any).parser = new Parser()
+((window: any): void => {
+  window.parser = new Parser()
+  window.getElementByIdPattern = getElementByIdPattern
+})(window)
