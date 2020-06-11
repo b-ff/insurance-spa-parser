@@ -11,9 +11,12 @@ const INSURER_FIELD_ID_PATTERN = /^commonInsurersCombo-\d{4,}-inputEl$/
 const INSURERS_LIST_ID_PATTERN = /^commonInsurersCombo-\d{4,}-picker-listEl$/
 const INSURERS_LIST_TOGGLE_ID_PATTERN = /^commonInsurersCombo-\d{4,}-trigger-picker$/
 const FILTERS_PANEL_ID_PATTERN = /^filter-panel-\d{4,}$/
-const PARCELS_LIST_SELECTOR = '#parcelsList-1980'
-const URL_COLUMN_SELECTOR = '.x-grid-cell-gridcolumn-1988'
-const SEND_DATE_COLUMN_SELECTOR = '.x-grid-cell-datecolumn-1992'
+const PARCELS_LIST_ID_PATTERN = /^parcelsList-\d{4,}-body$/
+
+const FILE_LINK_CELL_INDEX = 5
+const FILE_SEND_DATE_CELL_INDEX = 9
+
+const FILTERS_CHANGE_INTERVAL = 2000
 
 interface IFileData {
   sendDate: Date,
@@ -100,7 +103,7 @@ class Parser {
     this.setInsurer(this.getInsurers()[0])
     this.getFilterSubmitButton().click()
 
-    // this.downloadFile(this.getFilesList().pop())
+    this.downloadFile(this.getFilesList().pop())
   }
 
   public getMessageTypes(): string[] {
@@ -113,6 +116,7 @@ class Parser {
   public setMessageType(messageType: string): void {
     const input = getElementByIdPattern(document, MESSAGE_TYPE_FIELD_ID_PATTERN, 'input') as HTMLInputElement
     input.value = messageType
+    this.log('Set message type filter to:', messageType)
   }
 
   private getInsurersSuggestions(): ChildNode[] {
@@ -129,6 +133,7 @@ class Parser {
     const matchingSuggestion = suggestions.find((element: Element): boolean => element.textContent === insurer) as HTMLElement
 
     matchingSuggestion.click()
+    this.log('Set insurer filter to:', insurer)
   }
 
   public getFilterSubmitButton(): HTMLElement | null {
@@ -157,10 +162,11 @@ class Parser {
   }
 
   private getFilesList(): any[] {
-    return Array.from(document.querySelector(PARCELS_LIST_SELECTOR).querySelectorAll('table'))
+    return Array.from(getElementByIdPattern(document, PARCELS_LIST_ID_PATTERN).querySelectorAll('table'))
       .map((tableElement: HTMLElement): IFileData => {
-        const urlCell = tableElement.querySelector(URL_COLUMN_SELECTOR)
-        const dateCell = tableElement.querySelector(SEND_DATE_COLUMN_SELECTOR)
+        const cells = tableElement.querySelectorAll('td')
+        const urlCell = cells[FILE_LINK_CELL_INDEX]
+        const dateCell = cells[FILE_SEND_DATE_CELL_INDEX]
 
         const url = urlCell ? urlCell.querySelector('a').href : null
         const sendDate = dateCell ? this.getDateFromElement(dateCell.firstChild) : new Date()
