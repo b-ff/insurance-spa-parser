@@ -170,8 +170,9 @@ class Parser {
         const cells = tableElement.querySelectorAll('td')
         const urlCell = cells[FILE_LINK_CELL_INDEX]
         const dateCell = cells[FILE_SEND_DATE_CELL_INDEX]
+        const link = urlCell ? urlCell.querySelector('a') : null
 
-        const url = urlCell ? urlCell.querySelector('a').href : null
+        const url = link ? link.href : null
         const sendDate = dateCell ? this.getDateFromElement(dateCell.firstChild) : new Date()
 
         return {
