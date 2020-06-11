@@ -115,14 +115,20 @@ class Parser {
     input.value = messageType
   }
 
-  public getInsurers(): string[] {
+  private getInsurersSuggestions(): ChildNode[] {
     return Array.from(getElementByIdPattern(document, INSURERS_LIST_ID_PATTERN, 'ul').childNodes)
-      .map((element: Element): string => element.textContent.trim())
+  }
+
+  public getInsurers(): string[] {
+    return this.getInsurersSuggestions()
+      .map((element: Element): string => element.textContent)
   }
 
   public setInsurer(insurer: string): void {
-    const input = getElementByIdPattern(document, INSURER_FIELD_ID_PATTERN, 'input') as HTMLInputElement
-    input.value = insurer
+    const suggestions = this.getInsurersSuggestions()
+    const matchingSuggestion = suggestions.find((element: Element): boolean => element.textContent === insurer) as HTMLElement
+
+    matchingSuggestion.click()
   }
 
   public getFilterSubmitButton(): HTMLElement | null {
