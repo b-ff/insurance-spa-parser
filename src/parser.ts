@@ -7,8 +7,8 @@ const DATE_FORMAT = 'dd.mm.yyyy hh:ii'
 
 const START_BUTTON_CONTAINER_ID_PATTERN = /^filter-panel-\d{4,}_header-title-textEl$/
 const MESSAGE_TYPE_FIELD_ID_PATTERN = /^messageTypeCombo-\d{4,}-inputEl$/
-const INSURER_FIELD_ID_PATTERN = /^commonInsurersCombo-{4,}-inputEl$/
-const INSURERS_LIST_ID_PATTERN = /^commonInsurersCombo-{4,}-picker-listEl$/
+const INSURER_FIELD_ID_PATTERN = /^commonInsurersCombo-\d{4,}-inputEl$/
+const INSURERS_LIST_ID_PATTERN = /^commonInsurersCombo-\d{4,}-picker-listEl$/
 const PARCELS_LIST_SELECTOR = '#parcelsList-1980'
 const URL_COLUMN_SELECTOR = '.x-grid-cell-gridcolumn-1988'
 const SEND_DATE_COLUMN_SELECTOR = '.x-grid-cell-datecolumn-1992'
@@ -22,6 +22,8 @@ const getElementByIdPattern = (parent: HTMLElement | Document, idPattern: RegExp
   const elements = parent.querySelectorAll(tagName)
   return Array.from(elements).find((element: Element): boolean => idPattern.test(element.id))
 }
+
+(window as any).getElementByIdPattern = getElementByIdPattern
 
 const stringToDateByFormat = (text: string, format: string): Date => {
   const normalized      = text.replace(/[^a-zA-Z0-9]/g, '-')
