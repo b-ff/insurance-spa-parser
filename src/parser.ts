@@ -1,6 +1,7 @@
 const REPORT_IN_MGFOMS = 'Отчёт МО в МГФОМС'
 const REPORT_IN_SMO = 'Отчёт МО в СМО'
 
+const START_BUTTON_ID = 'parser-start-button'
 
 const DATE_FORMAT = 'dd.mm.yyyy hh:ii'
 
@@ -50,8 +51,16 @@ const stringToDateByFormat = (text: string, format: string): Date => {
 
 class Parser {
   constructor() {
+    const intervalId = setInterval((): void => {
+      const buttonContainer = getElementByIdPattern(document, START_BUTTON_CONTAINER_ID_PATTERN)
+
+      if (buttonContainer) {
+        this.addStartButton(buttonContainer)
+        clearInterval(intervalId)
+      }
+    }, 500)
+
     this.log('Parser initialized!')
-    this.addStartButton()
   }
 
   private log(...args: any): void {
@@ -60,18 +69,18 @@ class Parser {
     }
   }
 
-  private addStartButton(): void {
+  private addStartButton(container: Element): void {
     const button = document.createElement('button')
-    const buttonContainer = getElementByIdPattern(document, START_BUTTON_CONTAINER_ID_PATTERN)
 
     button.innerHTML = 'Запустить сбор данных'
+    button.id = START_BUTTON_ID
     button.style.marginLeft = '10px'
     button.style.cursor = 'pointer'
     button.onclick = (): void => { this.startParser() }
 
-    buttonContainer.append(button)
+    container.append(button)
 
-    this.log(buttonContainer)
+    this.log('Added start button to container:', container)
   }
 
   public startParser(): void {
@@ -138,6 +147,4 @@ class Parser {
   }
 }
 
-setTimeout((): void => {
-  (window as any).parser = new Parser()
-}, 2000)
+(window as any).parser = new Parser()
