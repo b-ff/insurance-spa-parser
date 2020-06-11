@@ -103,7 +103,10 @@ class Parser {
     this.setInsurer(this.getInsurers()[0])
     this.getFilterSubmitButton().click()
 
-    this.downloadFile(this.getFilesList().pop())
+    setTimeout((): void => {
+      this.downloadFile(this.getFilesList().pop())
+    }, 2000)
+
   }
 
   public getMessageTypes(): string[] {
@@ -161,7 +164,7 @@ class Parser {
     return null
   }
 
-  private getFilesList(): any[] {
+  public getFilesList(): any[] {
     return Array.from(getElementByIdPattern(document, PARCELS_LIST_ID_PATTERN).querySelectorAll('table'))
       .map((tableElement: HTMLElement): IFileData => {
         const cells = tableElement.querySelectorAll('td')
