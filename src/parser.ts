@@ -60,6 +60,9 @@ const stringToDateByFormat = (text: string, format: string): Date => {
 }
 
 class Parser {
+  private runnerTimeoutA: any
+  private runnerTimeoutB: any
+
   constructor() {
     const intervalId = setInterval((): void => {
       const buttonContainer = getElementByIdPattern(document, START_BUTTON_CONTAINER_ID_PATTERN)
@@ -118,13 +121,13 @@ class Parser {
 
     messageTypes.forEach((messageType: string, messageTypeIndex: number): void => {
       insurers.forEach((insurer: string, insurerIndex: number): void => {
-        setTimeout((): void => {
+        this.runnerTimeoutA = setTimeout((): void => {
           this.log('Applying filter values:', {messageType, insurer})
           this.setMessageType(messageType)
           this.setInsurer(insurer)
           this.getFilterSubmitButton().click()
 
-          setTimeout((): void => {
+          this.runnerTimeoutB = setTimeout((): void => {
             this.log('Getting files list')
 
             const filesList = this.getFilesList()
@@ -149,6 +152,11 @@ class Parser {
       })
     })
 
+  }
+
+  public stopParser(): void {
+    clearTimeout(this.runnerTimeoutA)
+    clearTimeout(this.runnerTimeoutB)
   }
 
   private getMessageTypeSuggestions(): ChildNode[] {
