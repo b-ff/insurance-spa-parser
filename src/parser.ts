@@ -1,12 +1,16 @@
 const REPORT_IN_MGFOMS = 'Отчёт МО в МГФОМС'
 const REPORT_IN_SMO = 'Отчёт МО в СМО'
 
+const ALLOWED_MESSAGE_TYPES = [REPORT_IN_MGFOMS, REPORT_IN_SMO]
+
 const START_BUTTON_ID = 'parser-start-button'
 
 const DATE_FORMAT = 'dd.mm.yyyy hh:ii'
 
 const START_BUTTON_CONTAINER_ID_PATTERN = /^filter-panel-\d{4,}_header-title-textEl$/
 const MESSAGE_TYPE_FIELD_ID_PATTERN = /^messageTypeCombo-\d{4,}-inputEl$/
+const MESSAGE_TYPES_LIST_ID_PATTERN = /^messageTypeCombo-\d{4,}-picker-listEl$/
+const MESSAGE_TYPE_LIST_TOGGLE_ID_PATTERN = /^messageTypeCombo-\d{4,}-trigger-picker$/
 const INSURER_FIELD_ID_PATTERN = /^commonInsurersCombo-\d{4,}-inputEl$/
 const INSURERS_LIST_ID_PATTERN = /^commonInsurersCombo-\d{4,}-picker-listEl$/
 const INSURERS_LIST_TOGGLE_ID_PATTERN = /^commonInsurersCombo-\d{4,}-trigger-picker$/
@@ -64,8 +68,14 @@ class Parser {
         this.addStartButton(buttonContainer)
 
         const insurersListToggle = getElementByIdPattern(document, INSURERS_LIST_TOGGLE_ID_PATTERN) as HTMLElement
-        insurersListToggle.click()
-        setTimeout((): void => { insurersListToggle.click() }, 500)
+        const messageTypeListToggle = getElementByIdPattern(document, MESSAGE_TYPE_LIST_TOGGLE_ID_PATTERN) as HTMLElement
+
+        messageTypeListToggle.click()
+        setTimeout((): void => {
+          messageTypeListToggle.click()
+          insurersListToggle.click()
+          setTimeout((): void => { insurersListToggle.click() }, 500)
+        }, 500)
 
         clearInterval(intervalId)
       }
@@ -141,16 +151,21 @@ class Parser {
 
   }
 
+  private getMessageTypeSuggestions(): ChildNode[] {
+    return Array.from(getElementByIdPattern(document, MESSAGE_TYPES_LIST_ID_PATTERN, 'ul').childNodes)
+  }
+
   public getMessageTypes(): string[] {
-    return [
-      REPORT_IN_MGFOMS,
-      REPORT_IN_SMO
-    ]
+    return this.getMessageTypeSuggestions()
+      .map((element: Element): string => element.textContent)
+      .filter((messageType: string): boolean => ALLOWED_MESSAGE_TYPES.includes(messageType))
   }
 
   public setMessageType(messageType: string): void {
-    const input = getElementByIdPattern(document, MESSAGE_TYPE_FIELD_ID_PATTERN, 'input') as HTMLInputElement
-    input.value = messageType
+    const suggestions = this.getInsurersSuggestions()
+    const matchingSuggestion = suggestions.find((element: Element): boolean => element.textContent === messageType) as HTMLElement
+
+    matchingSuggestion.click()
     this.log('Set message type filter to:', messageType)
   }
 
