@@ -60,8 +60,7 @@ const stringToDateByFormat = (text: string, format: string): Date => {
 }
 
 class Parser {
-  private runnerTimeoutA: any
-  private runnerTimeoutB: any
+  private timeoutIDs: any[] = []
   private isRunning: boolean = false
 
   constructor() {
@@ -121,8 +120,9 @@ class Parser {
   }
 
   public startParser(): void {
-    this.isRunning = true
     this.log('Parser started!')
+    this.isRunning = true
+    this.timeoutIDs = []
 
     const messageTypes = this.getMessageTypes()
     const insurers = this.getInsurers()
@@ -134,13 +134,13 @@ class Parser {
 
     messageTypes.forEach((messageType: string, messageTypeIndex: number): void => {
       insurers.forEach((insurer: string, insurerIndex: number): void => {
-        this.runnerTimeoutA = setTimeout((): void => {
+        const timeoutA = setTimeout((): void => {
           this.log('Applying filter values:', {messageType, insurer})
           this.setMessageType(messageType)
           this.setInsurer(insurer)
           this.getFilterSubmitButton().click()
 
-          this.runnerTimeoutB = setTimeout((): void => {
+          const timeoutB = setTimeout((): void => {
             this.log('Getting files list')
 
             const filesList = this.getFilesList()
@@ -159,7 +159,10 @@ class Parser {
               alert('Загрузка файлов завершена!')
             }
           }, PARCELS_LOAD_TIME)
+
+          this.timeoutIDs.push(timeoutB)
         }, increment * (PARCELS_LOAD_TIME + FILTERS_CHANGE_INTERVAL))
+        this.timeoutIDs.push(timeoutA)
 
         increment++
       })
@@ -168,8 +171,7 @@ class Parser {
   }
 
   public stopParser(): void {
-    clearTimeout(this.runnerTimeoutA)
-    clearTimeout(this.runnerTimeoutB)
+    this.timeoutIDs.forEach((timeoutID: number): void => { clearTimeout(timeoutID) })
     this.isRunning = false
   }
 
