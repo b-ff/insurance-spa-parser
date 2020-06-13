@@ -62,6 +62,7 @@ const stringToDateByFormat = (text: string, format: string): Date => {
 class Parser {
   private runnerTimeoutA: any
   private runnerTimeoutB: any
+  private isRunning: boolean = false
 
   constructor() {
     const intervalId = setInterval((): void => {
@@ -74,6 +75,7 @@ class Parser {
         const messageTypeListToggle = getElementByIdPattern(document, MESSAGE_TYPE_LIST_TOGGLE_ID_PATTERN) as HTMLElement
 
         messageTypeListToggle.click()
+
         setTimeout((): void => {
           messageTypeListToggle.click()
           insurersListToggle.click()
@@ -95,13 +97,23 @@ class Parser {
   }
 
   private addStartButton(container: Element): void {
+    const startText = 'Запустить сбор данных'
+    const stopText = 'Остановить сбор данных'
     const button = document.createElement('button')
 
-    button.innerHTML = 'Запустить сбор данных'
+    button.innerHTML = startText
     button.id = START_BUTTON_ID
     button.style.marginLeft = '10px'
     button.style.cursor = 'pointer'
-    button.onclick = (): void => { this.startParser() }
+    button.onclick = (): void => {
+      if (this.isRunning) {
+        this.stopParser()
+      } else {
+        this.startParser()
+      }
+
+      button.innerHTML = this.isRunning ? stopText : startText
+    }
 
     container.append(button)
 
@@ -109,6 +121,7 @@ class Parser {
   }
 
   public startParser(): void {
+    this.isRunning = true
     this.log('Parser started!')
 
     const messageTypes = this.getMessageTypes()
@@ -157,6 +170,7 @@ class Parser {
   public stopParser(): void {
     clearTimeout(this.runnerTimeoutA)
     clearTimeout(this.runnerTimeoutB)
+    this.isRunning = false
   }
 
   private getMessageTypeSuggestions(): ChildNode[] {
@@ -170,7 +184,7 @@ class Parser {
   }
 
   public setMessageType(messageType: string): void {
-    const suggestions = this.getInsurersSuggestions()
+    const suggestions = this.getMessageTypeSuggestions()
     const matchingSuggestion = suggestions.find((element: Element): boolean => element.textContent === messageType) as HTMLElement
 
     matchingSuggestion.click()
