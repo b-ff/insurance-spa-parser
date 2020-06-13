@@ -116,7 +116,15 @@ class Parser {
 
           setTimeout((): void => {
             this.log('Getting files list')
-            this.downloadFile(this.getFilesList().pop())
+
+            const filesList = this.getFilesList()
+
+            if (filesList.length) {
+              this.log(`Found ${filesList.length} files`)
+              this.downloadFile(this.getFilesList().pop())
+            } else {
+              this.log(`No files for selected filters`)
+            }
 
             const isLastMessageType = messageTypeIndex === messageTypes.length - 1
             const isLastInsurer = insurerIndex === insurers.length - 1
@@ -204,6 +212,7 @@ class Parser {
           sendDate
         }
       })
+      .filter((file: IFileData): boolean => !!file.url)
       .sort((a: IFileData, b: IFileData): number => a.sendDate.getTime() - b.sendDate.getTime())
   }
 
