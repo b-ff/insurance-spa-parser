@@ -164,7 +164,7 @@ class Parser {
             }
 
             const isLastMessageType = messageTypeIndex === messageTypes.length - 1
-            const isLastInsurer = insurerIndex === insurers.length - 1
+            const isLastInsurer = insurerIndex === filteredInsurers.length - 1
 
             if (isLastMessageType && isLastInsurer) {
               alert('Загрузка файлов завершена!')
