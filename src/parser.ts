@@ -64,7 +64,6 @@ const stringToDateByFormat = (text: string, format: string): Date => {
 class Parser {
   private timeoutIDs: any[] = []
   private isRunning: boolean = false
-  private currentMessageType: string
 
   constructor() {
     const intervalId = setInterval((): void => {
@@ -138,10 +137,14 @@ class Parser {
     messageTypes.forEach((messageType: string, messageTypeIndex: number): void => {
       this.setMessageType(messageType)
 
+      this.log('Checking message type for MGFOMS', messageType === REPORT_IN_MGFOMS)
+
       const filteredInsurers = insurers.filter((insurer: string): boolean => {
-        const isMGFOMSinsurer = insurer.includes(MGFOMS)
-        return this.currentMessageType === REPORT_IN_MGFOMS ? isMGFOMSinsurer : !isMGFOMSinsurer
+        const isMGFOMSinsurer = insurer.toLocaleLowerCase().includes(MGFOMS.toLocaleLowerCase())
+        return (messageType === REPORT_IN_MGFOMS) ? isMGFOMSinsurer : !isMGFOMSinsurer
       })
+
+      this.log('Filtered insurers according to message type', filteredInsurers)
 
       filteredInsurers.forEach((insurer: string, insurerIndex: number): void => {
         const timeoutA = setTimeout((): void => {
@@ -199,8 +202,6 @@ class Parser {
     const matchingSuggestion = suggestions.find((element: Element): boolean => element.textContent === messageType) as HTMLElement
 
     matchingSuggestion.click()
-
-    this.currentMessageType = messageType
 
     this.log('Set message type filter to:', messageType)
   }
