@@ -135,8 +135,6 @@ class Parser {
     let increment = 0
 
     messageTypes.forEach((messageType: string, messageTypeIndex: number): void => {
-      this.setMessageType(messageType)
-
       this.log('Checking message type for MGFOMS', messageType === REPORT_IN_MGFOMS)
 
       const filteredInsurers = insurers.filter((insurer: string): boolean => {
@@ -149,6 +147,7 @@ class Parser {
       filteredInsurers.forEach((insurer: string, insurerIndex: number): void => {
         const timeoutA = setTimeout((): void => {
           this.log('Applying filter values:', {messageType, insurer})
+          this.setMessageType(messageType)
           this.setInsurer(insurer)
           this.getFilterSubmitButton().click()
 
