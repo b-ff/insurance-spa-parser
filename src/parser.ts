@@ -251,7 +251,7 @@ class Parser {
     return Array.from(getElementByIdPattern(document, PARCELS_LIST_ID_PATTERN).querySelectorAll('table'))
       .map((tableElement: HTMLElement): IFileData => {
         const cells = tableElement.querySelectorAll('td')
-        const urlCell = cells[FILE_LINK_CELL_INDEX]
+        const urlCell = Array.from(cells).find((cell: HTMLElement) => cell.querySelector('a'))
         const dateCell = cells[FILE_SEND_DATE_CELL_INDEX]
         const link = urlCell ? urlCell.querySelector('a') : null
 
