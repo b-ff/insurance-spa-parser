@@ -3,6 +3,16 @@ const MGFOMS = 'МГФОМС'
 const REPORT_IN_MGFOMS = 'Отчёт МО в МГФОМС'
 const REPORT_IN_SMO = 'Отчёт МО в СМО'
 
+/**
+ * Данные параметры инициированы, как решение проблемы от 21.01.2021:
+ * После переименования компании АО "Страховая группа "Спасские ворота-М" в
+ * 2884 - МГФОМС (за АО "Страховая группа "Спасские ворота-М")
+ * она не участвовала в переборе отчётов МО в СМО
+ **/
+
+const PASS_ALL_TO_SMO = true
+const PASS_ALL_TO_MGFOMS = false
+
 const ALLOWED_MESSAGE_TYPES = [REPORT_IN_MGFOMS, REPORT_IN_SMO]
 
 const START_BUTTON_ID = 'parser-start-button'
@@ -139,7 +149,7 @@ class Parser {
 
       const filteredInsurers = insurers.filter((insurer: string): boolean => {
         const isMGFOMSinsurer = insurer.toLocaleLowerCase().includes(MGFOMS.toLocaleLowerCase())
-        return (messageType === REPORT_IN_MGFOMS) ? isMGFOMSinsurer : !isMGFOMSinsurer
+        return (messageType === REPORT_IN_MGFOMS) ? (PASS_ALL_TO_MGFOMS || isMGFOMSinsurer) : (PASS_ALL_TO_SMO || !isMGFOMSinsurer)
       })
 
       this.log('Filtered insurers according to message type', filteredInsurers)
